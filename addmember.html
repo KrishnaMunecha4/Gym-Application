@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Gym Members</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Background image with hover animation and higher resolution */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://plus.unsplash.com/premium_photo-1661286693672-2253d320fd3d?w=700&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1pbi1zYW1lLXNlcmllc3wxfHx8ZW58MHx8fHx8'); /* 1080p gym image */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: -1;
+            animation: hoverEffect 10s infinite ease-in-out;
+        }
+
+        @keyframes hoverEffect {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: scale(1.30);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th, td {
+            padding: 10px;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        button {
+            padding: 5px 10px;
+            background-color: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: darkred;
+        }
+    </style>
+</head>
+<body>
+    <center><a href="home.html" class="cta-button">Home</a></center><br>
+    <div class="container">
+        <h2>Add Gym Member</h2>
+        <form id="memberForm">
+            <label for="name">Full Name:</label>
+            <input type="text" id="name" required> 
+            
+            <label for="age">Age:</label>
+            <input type="number" id="age" required> 
+            
+            <label for="gender">Gender:</label>
+            <select id="gender">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+            </select> 
+            
+            <label for="email">Email:</label>
+            <input type="email" id="email" required> 
+            
+            <label for="contact">Contact:</label>
+            <input type="text" id="contact" required><br><br>
+            
+            <label for="membership">Membership Duration:</label>
+            <select id="membership">
+                <option value="3">3 Months</option>
+                <option value="6">6 Months</option>
+                <option value="12">1 Year</option>
+            </select> 
+            
+            <label for="paid">Amount Paid:</label>
+            <input type="number" id="paid" required><br><br>
+            
+           <center><button type="submit">Add Member</button> 
+           <button type="reset">Reset</button></center>
+        </form>
+        
+        <h2>Added Members List</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Gender</th>
+                    <th>Email</th>
+                    <th>Contact</th>
+                    <th>Membership</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Paid</th>
+                    <th>Pending</th>
+                    <th>Billing</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="memberList"></tbody>
+        </table>
+    </div>
+    
+   <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            loadMembers();
+        });
+
+        document.getElementById("memberForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            
+            let name = document.getElementById("name").value;
+            let age = document.getElementById("age").value;
+            let gender = document.getElementById("gender").value;
+            let email = document.getElementById("email").value;
+            let contact = document.getElementById("contact").value;
+            let membership = parseInt(document.getElementById("membership").value);
+            let paid = parseInt(document.getElementById("paid").value);
+            let startDate = new Date();
+            let endDate = new Date();
+            endDate.setMonth(endDate.getMonth() + membership);
+            let totalCost = membership * 1000; // Example cost per month: 1000
+            let pending = totalCost - paid;
+            
+            let members = JSON.parse(localStorage.getItem("members")) || [];
+            let newId;
+            do {
+                newId = "M" + Math.floor(1000 + Math.random() * 9000);
+            } while (members.some(member => member.id === newId));
+            
+            let member = {
+                id: newId,
+                name,
+                age,
+                gender,
+                email,
+                contact,
+                membership,
+                startDate: startDate.toISOString().split("T")[0],
+                endDate: endDate.toISOString().split("T")[0],
+                paid,
+                pending
+            };
+            
+            members.push(member);
+            localStorage.setItem("members", JSON.stringify(members));
+            loadMembers();
+            document.getElementById("memberForm").reset();
+        });
+
+        function loadMembers() {
+            let members = JSON.parse(localStorage.getItem("members")) || [];
+            let tableBody = document.getElementById("memberList");
+            tableBody.innerHTML = "";
+            
+            members.forEach(member => {
+                let row = `<tr>
+                    <td>${member.id}</td>
+                    <td>${member.name}</td>
+                    <td>${member.age}</td>
+                    <td>${member.gender}</td>
+                    <td>${member.email}</td>
+                    <td>${member.contact}</td>
+                    <td>${member.membership} Months</td>
+                    <td>${member.startDate}</td>
+                    <td>${member.endDate}</td>
+                    <td>${member.paid}</td>
+                    <td>${member.pending}</td>
+                    <td><a href="members.html?id=${member.id}">Activation</a></td>
+                    <td><button onclick="removeMember('${member.id}')">Remove</button></td>
+                </tr>`;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        function removeMember(id) {
+            let members = JSON.parse(localStorage.getItem("members")) || [];
+            let membersList = JSON.parse(localStorage.getItem("membersList")) || [];
+
+            // Remove from Add Members page storage
+            members = members.filter(member => member.id !== id);
+            localStorage.setItem("members", JSON.stringify(members));
+
+            // Ensure the member stays saved in Members page storage
+            let removedMember = membersList.find(member => member.id === id);
+            if (!removedMember) {
+                let originalMember = JSON.parse(localStorage.getItem("membersList")) || [];
+                let memberToSave = originalMember.find(member => member.id === id);
+                if (memberToSave) {
+                    membersList.push(memberToSave);
+                    localStorage.setItem("membersList", JSON.stringify(membersList));
+                }
+            }
+
+            loadMembers(); // Reload table
+        }
+    </script>
+</body>
+</html>
