@@ -3,15 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Add cache-control meta tags to prevent Chrome caching -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Gym Management Login</title>
   <style>
+    /* [Your existing CSS remains unchanged] */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
       font-family: Arial, sans-serif;
     }
-
     body {
       display: flex;
       justify-content: center;
@@ -20,7 +24,6 @@
       background: linear-gradient(135deg, #1a1a1a, #333333);
       color: #fff;
     }
-
     .login-container {
       display: flex;
       width: 800px;
@@ -29,43 +32,36 @@
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
       overflow: hidden;
     }
-
     .login-image {
       width: 50%;
       background: url('https://images.unsplash.com/photo-1593079831268-3381b0db4a77?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80') no-repeat center;
       background-size: cover;
     }
-
     .login-form {
       width: 50%;
       padding: 40px;
       background: #222;
     }
-
     .login-form h2 {
       font-size: 28px;
       color: #ffcc00;
       margin-bottom: 20px;
       text-align: center;
     }
-
     .login-form p {
       color: #ccc;
       text-align: center;
       margin-bottom: 30px;
     }
-
     .form-group {
       margin-bottom: 20px;
     }
-
     .form-group label {
       display: block;
       color: #fff;
       margin-bottom: 5px;
       font-weight: bold;
     }
-
     .form-group input {
       width: 100%;
       padding: 10px;
@@ -75,12 +71,10 @@
       color: #fff;
       font-size: 16px;
     }
-
     .form-group input:focus {
       outline: none;
       background: #444;
     }
-
     .login-btn {
       width: 100%;
       padding: 12px;
@@ -93,23 +87,19 @@
       cursor: pointer;
       transition: background 0.3s;
     }
-
     .login-btn:hover {
       background: #e6b800;
     }
-
     .footer-text {
       text-align: center;
       margin-top: 20px;
       color: #999;
       font-size: 12px;
     }
-
     .footer-text a {
       color: #ffcc00;
       text-decoration: none;
     }
-
     .footer-text a:hover {
       text-decoration: underline;
     }
@@ -140,24 +130,41 @@
   </div>
 
   <script>
-    // Redirect to home.html if already logged in
-    if (localStorage.getItem('authToken') === 'loggedIn') {
-      window.location.href = "home.html";
+    // Function to check auth status
+    function checkAuth() {
+      const authToken = localStorage.getItem('authToken');
+      // Add timestamp check to prevent stale tokens in Chrome
+      const loginTimestamp = localStorage.getItem('loginTimestamp');
+      const currentTime = Date.now();
+      const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
+
+      // Only redirect if token is valid and not expired
+      if (authToken === 'loggedIn' && loginTimestamp && (currentTime - loginTimestamp < oneHour)) {
+        window.location.replace("home.html");
+      } else if (authToken && (!loginTimestamp || currentTime - loginTimestamp >= oneHour)) {
+        // Clear expired token
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('loginTimestamp');
+      }
     }
 
-    function validateLogin(event) {
-      event.preventDefault(); // Prevent form submission
+    // Run check immediately and on DOM load to catch Chrome's timing
+    checkAuth();
+    document.addEventListener('DOMContentLoaded', checkAuth);
 
+    function validateLogin(event) {
+      event.preventDefault();
+      
       const username = document.getElementById('username').value;
       const password = document.getElementById('password').value;
-
-      // Hardcoded credentials
+      
       const validUsername = "admin";
       const validPassword = "1234";
 
       if (username === validUsername && password === validPassword) {
         localStorage.setItem('authToken', 'loggedIn');
-        window.location.href = "home.html";
+        localStorage.setItem('loginTimestamp', Date.now()); // Add timestamp
+        window.location.replace("home.html");
       } else {
         alert("Invalid username or password. Please try again.");
       }
