@@ -3,11 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Add cache-control meta tags to prevent Chrome caching -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Gym Management Home</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
   <!-- Sidebar Navigation -->
   <div class="sidebar">
     <h2>Gym Management</h2>
@@ -55,25 +58,36 @@
       </div>
     </section>
   </div>
-    </section>
-  </div>
 
   <footer>
-    <p>&copy; 2025 Gym Management System | All Rights Reserved</p>
+    <p>© 2025 Gym Management System | All Rights Reserved</p>
   </footer>
 
   <script>
-    // Check if user is authenticated
-    if (localStorage.getItem('authToken') !== 'loggedIn') {
-      window.location.href = "index.html";
+    // Function to check auth status
+    function checkAuth() {
+      const authToken = localStorage.getItem('authToken');
+      const loginTimestamp = localStorage.getItem('loginTimestamp');
+      const currentTime = Date.now();
+      const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
+
+      if (!authToken || authToken !== 'loggedIn' || !loginTimestamp || (currentTime - loginTimestamp >= oneHour)) {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('loginTimestamp');
+        window.location.replace("index.html");
+      }
     }
+
+    // Run check immediately and on DOM load
+    checkAuth();
+    document.addEventListener('DOMContentLoaded', checkAuth);
 
     // Logout function
     function logout() {
       localStorage.removeItem('authToken');
-      window.location.href = "index.html";
+      localStorage.removeItem('loginTimestamp');
+      window.location.replace("index.html");
     }
   </script>
-
 </body>
 </html>
