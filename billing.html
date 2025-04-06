@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing & Invoice</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+             margin: 0; /* Remove default margin */
+            padding: 0; /* Remove default padding */
+            background-color: #f4f4f4; /* Fallback color */
+            position: relative; /* Positioning context for ::before */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        /* Background image with hover animation */
+        body::before {
+            content: "";
+            position: fixed; /* Fixed to stay in the background */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://plus.unsplash.com/premium_photo-1661326350444-8d0e57e4cdad?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDF8fGZpbmFuY2V8ZW58MHx8MHx8fDA%3D');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: -1; /* Place behind content */
+            animation: hoverEffect 10s infinite ease-in-out; /* Animation for hover effect */
+        }
+
+        @keyframes hoverEffect {
+            0% {
+                transform: scale(1); /* Normal size */
+                opacity: 0.8; /* Slightly faded */
+            }
+            50% {
+                transform: scale(1.30); /* Slightly zoomed in */
+                opacity: 1; /* Fully visible */
+            }
+            100% {
+                transform: scale(1); /* Back to normal */
+                opacity: 0.8; /* Slightly faded again */
+            }
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .invoice {
+            padding: 20px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #searchBar {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .saved-invoices {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <center><a href="home.html" class="cta-button">Home</a></center><br>
+    <div class="container">
+        <h2>Billing & Invoice</h2>
+        <input type="text" id="searchBar" 
+       placeholder="🔍 Type to Search Active Members..." 
+       onkeyup="searchInvoice()" 
+       style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #007bff; border-radius: 8px; outline: none; transition: 0.3s;"
+       onfocus="this.style.borderColor='#0056b3';" 
+       onblur="this.style.borderColor='#007bff';">
+        <div id="invoice" class="invoice">
+            <h3>Member Details</h3>
+            <p><strong>ID:</strong> <span id="memberId"></span></p>
+            <p><strong>Name:</strong> <span id="memberName"></span></p>
+            <p><strong>Membership:</strong> <span id="membership"></span> Months</p>
+            <p><strong>Start Date:</strong> <span id="startDate"></span></p>
+            <p><strong>End Date:</strong> <span id="endDate"></span></p>
+            <p><strong>Total Cost:</strong> ₹<span id="totalCost"></span></p>
+            <p><strong>Amount Paid:</strong> ₹<span id="paidAmount"></span></p>
+            <p><strong>Pending Amount:</strong> ₹<span id="pendingAmount"></span></p>
+        </div>
+        <button onclick="printInvoice()">Print Invoice</button>
+        <button onclick="saveInvoiceCopy()">Save Invoice</button>
+        <h3>Saved Invoices</h3>
+        <div id="savedInvoicesList" class="saved-invoices"></div>
+    </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const memberId = urlParams.get("id");
+
+    if (memberId) {
+        // Load invoice from active members or saved invoices
+        let activeMembers = JSON.parse(localStorage.getItem("activeMembers")) || [];
+        let member = activeMembers.find(m => String(m.id) === String(memberId));
+        
+        if (!member) {
+            let savedInvoices = JSON.parse(localStorage.getItem("savedInvoices")) || [];
+            member = savedInvoices.find(inv => String(inv.id) === String(memberId));
+        }
+
+        if (member) {
+            displayInvoice(member);
+        } else {
+            alert("❌ No matching invoice found!");
+        }
+    } else {
+        // If no ID in URL, load last viewed invoice
+        let lastInvoice = JSON.parse(localStorage.getItem("lastViewedInvoice"));
+        if (lastInvoice) {
+            console.log("🔄 Loading last viewed invoice:", lastInvoice);
+            displayInvoice(lastInvoice);
+        } else {
+            alert("⚠️ No previous invoice available.");
+        }
+    }
+});
+
+function displayInvoice(member) {
+    document.getElementById("memberId").innerText = member.id;
+    document.getElementById("memberName").innerText = member.name;
+    document.getElementById("membership").innerText = member.membership;
+    document.getElementById("startDate").innerText = member.startDate;
+    document.getElementById("endDate").innerText = member.endDate;
+    
+    let feeStructure = {3: 3000, 6: 6000, 12: 12000};
+    let totalCost = feeStructure[member.membership] || 0;
+    let pendingAmount = totalCost - member.paid;
+
+    document.getElementById("totalCost").innerText = totalCost;
+    document.getElementById("paidAmount").innerText = member.paid;
+    document.getElementById("pendingAmount").innerText = pendingAmount;
+
+    // Save last viewed invoice for direct billing access
+    localStorage.setItem("lastViewedInvoice", JSON.stringify(member));
+}
+
+function autoSaveInvoice(member, totalCost, pendingAmount) {
+    let savedInvoices = JSON.parse(localStorage.getItem("savedInvoices")) || [];
+    let existingCopy = savedInvoices.find(inv => inv.id === member.id);
+
+    if (!existingCopy) {
+        let invoiceCopy = {
+            id: member.id,
+            name: member.name,
+            membership: member.membership,
+            startDate: member.startDate,
+            endDate: member.endDate,
+            totalCost: totalCost,
+            paid: member.paid,
+            pending: pendingAmount
+        };
+        savedInvoices.push(invoiceCopy);
+        localStorage.setItem("savedInvoices", JSON.stringify(savedInvoices));
+        console.log("✅ Auto-saved invoice:", invoiceCopy);
+    }
+}
+
+function displaySavedInvoices() {
+    let savedInvoices = JSON.parse(localStorage.getItem("savedInvoices")) || [];
+    let invoiceList = document.getElementById("savedInvoicesList");
+    invoiceList.innerHTML = savedInvoices.length ? savedInvoices.map(inv => `
+        <div class='invoice'>
+            <p><strong>ID:</strong> ${inv.id}</p>
+            <p><strong>Name:</strong> ${inv.name}</p>
+            <p><strong>Membership:</strong> ${inv.membership} Months</p>
+            <p><strong>Start Date:</strong> ${inv.startDate}</p>
+            <p><strong>End Date:</strong> ${inv.endDate}</p>
+            <p><strong>Total Cost:</strong> ₹${inv.totalCost}</p>
+            <p><strong>Paid:</strong> ₹${inv.paid}</p>
+            <p><strong>Pending:</strong> ₹${inv.pending}</p>
+            <button onclick="reprintInvoice('${inv.id}')">Reprint</button>
+            <button onclick="deleteInvoice('${inv.id}')">Delete</button>
+        </div>`).join('') : "<p>No saved invoices.</p>";
+}
+
+
+    function printInvoice() {
+        let invoiceContent = document.getElementById("invoice").innerHTML;
+        let originalContent = document.body.innerHTML;
+
+        document.body.innerHTML = `<div class='container'>${invoiceContent}</div>`;
+        window.print();
+        document.body.innerHTML = originalContent;
+        location.reload(); 
+    }
+
+    function saveInvoiceCopy() {
+        let invoiceCopy = {
+            id: document.getElementById("memberId").innerText,
+            name: document.getElementById("memberName").innerText,
+            membership: document.getElementById("membership").innerText,
+            startDate: document.getElementById("startDate").innerText,
+            endDate: document.getElementById("endDate").innerText,
+            totalCost: document.getElementById("totalCost").innerText,
+            paid: document.getElementById("paidAmount").innerText,
+            pending: document.getElementById("pendingAmount").innerText
+        };
+
+        let savedInvoices = JSON.parse(localStorage.getItem("savedInvoices")) || [];
+        let existingCopy = savedInvoices.find(inv => inv.id === invoiceCopy.id);
+
+        if (!existingCopy) {
+            savedInvoices.push(invoiceCopy);
+            localStorage.setItem("savedInvoices", JSON.stringify(savedInvoices));
+            alert("Invoice copy saved successfully!");
+        } else {
+            alert("Invoice copy already exists!");
+        }
+        displaySavedInvoices();
+    }
+
+   
+    function deleteInvoice(id) {
+        let savedInvoices = JSON.parse(localStorage.getItem("savedInvoices")) || [];
+        savedInvoices = savedInvoices.filter(inv => inv.id !== id);
+        localStorage.setItem("savedInvoices", JSON.stringify(savedInvoices));
+        displaySavedInvoices();
+    }
+
+    // Efficient Search Bar for Saved Invoices Only
+    function searchInvoice() {
+        let searchValue = document.getElementById("searchBar").value.toLowerCase();
+        let savedInvoices = JSON.parse(localStorage.getItem("savedInvoices")) || [];
+
+        let filteredInvoices = savedInvoices.filter(inv => 
+            inv.id.toLowerCase().includes(searchValue) || inv.name.toLowerCase().includes(searchValue)
+        );
+
+        let invoiceList = document.getElementById("savedInvoicesList");
+        if (filteredInvoices.length > 0) {
+            invoiceList.innerHTML = filteredInvoices.map(inv => `
+                <div class='invoice'>
+                    <p><strong>ID:</strong> ${inv.id}</p>
+                    <p><strong>Name:</strong> ${inv.name}</p>
+                    <p><strong>Membership:</strong> ${inv.membership} Months</p>
+                    <p><strong>Start Date:</strong> ${inv.startDate}</p>
+                    <p><strong>End Date:</strong> ${inv.endDate}</p>
+                    <p><strong>Total Cost:</strong> ₹${inv.totalCost}</p>
+                    <p><strong>Paid:</strong> ₹${inv.paid}</p>
+                    <p><strong>Pending:</strong> ₹${inv.pending}</p>
+                    <button onclick="reprintInvoice('${inv.id}')">Reprint</button>
+                    <button onclick="deleteInvoice('${inv.id}')">Delete</button>
+                </div>`).join('');
+        } else {
+            invoiceList.innerHTML = "<p>No matching saved invoice found!</p>";
+        }
+    }
+    //reprint function
+    function reprintInvoice(id = null) {
+    console.log("🔍 Attempting to reprint invoice for ID:", id);
+
+    let savedInvoices = JSON.parse(localStorage.getItem("savedInvoices")) || [];
+    let invoice = null;
+
+    if (id) {
+        // Find invoice by ID
+        invoice = savedInvoices.find(inv => String(inv.id) === String(id));
+    }
+
+    if (!invoice) {
+        // If no ID was provided (direct access to billing page), get the last viewed invoice
+        let lastInvoice = JSON.parse(localStorage.getItem("lastViewedInvoice"));
+        if (lastInvoice) {
+            console.log("📂 Using last viewed invoice:", lastInvoice);
+            invoice = lastInvoice;
+        }
+    }
+
+    if (!invoice) {
+        alert("❌ No invoice found to reprint!");
+        console.log("📂 Saved invoices:", savedInvoices);
+        return;
+    }
+
+    console.log("✅ Invoice found:", invoice);
+    displayInvoice(invoice);
+    setTimeout(printInvoice, 300); // Delay to allow content update
+}
+
+</script>
+</body>
+</html>
