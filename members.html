@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>        
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Members Information</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0; /* Remove default margin */
+            padding: 0; /* Remove default padding */
+            background-color: #f4f4f4; /* Fallback color */
+            position: relative; /* Positioning context for ::before */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        /* Background image with hover animation */
+        body::before {
+            content: "";
+            position: fixed; /* Fixed to stay in the background */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://plus.unsplash.com/premium_photo-1664475017762-27d88c6f2ba7?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDUwfHx8ZW58MHx8fHx8');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: -1; /* Place behind content */
+            animation: hoverEffect 10s infinite ease-in-out; /* Animation for hover effect */
+        }
+
+        @keyframes hoverEffect {
+            0% {
+                transform: scale(1); /* Normal size */
+                opacity: 0.8; /* Slightly faded */
+            }
+            50% {
+                transform: scale(1.30); /* Slightly zoomed in */
+                opacity: 1; /* Fully visible */
+            }
+            100% {
+                transform: scale(1); /* Back to normal */
+                opacity: 0.8; /* Slightly faded again */
+            }
+        }
+        .container {
+            max-width: 3000px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 50px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%; /* Make it take the full width */
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Center contents */
+
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th, td {
+            padding: 8px;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        button {
+            padding: 5px 10px;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .remove-btn {
+            background-color: red;
+            border-radius:10px;
+        }
+        .remove-btn:hover {
+            background-color: darkred;
+        }
+        .update-btn {
+            background-color: green;
+            border-radius:10px;
+        }
+        .update-btn:hover {
+            background-color: darkgreen;
+        }
+        .active-btn {
+            background-color: royalblue;
+            border-radius:10px;
+        }
+        .active-btn:hover {
+            background-color: blue;
+        }
+    </style>
+</head>
+<body>
+    <center><a href="home.html" class="cta-button">Home</a></center><br>
+    <div class="container">
+        <h2>Waiting List</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Gender</th>
+                    <th>Email</th>
+                    <th>Contact</th>
+                    <th>Membership</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Paid</th>
+                    <th>Pending</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="memberList"></tbody>
+        </table><br>
+    </div><br>
+    <input type="text" id="searchActiveBar" 
+       placeholder="🔍 Type to Search Active Members..." 
+       onkeyup="searchActiveMembers()" 
+       style="width: 50%; padding: 12px; font-size: 16px; border: 2px solid #007bff; border-radius: 8px; outline: none; transition: 0.3s;"
+       onfocus="this.style.borderColor='#0056b3';" 
+       onblur="this.style.borderColor='#007bff';"><br><br>
+    <div class="container">
+        <h2>Active Members</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Gender</th>
+                    <th>Email</th>
+                    <th>Contact</th>
+                    <th>Membership</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Paid</th>
+                    <th>Pending</th>
+                    <th>Billing</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="activeMemberList"></tbody>
+        </table>
+    </div>
+    
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        loadMembers();
+        loadActiveMembers();
+    });
+
+    function calculatePending(membership, paid) {
+        let feeStructure = {3: 3000, 6: 6000, 12: 12000};
+        let totalFee = feeStructure[membership] || 0;
+        return totalFee - paid;
+    }
+
+    function loadMembers() {
+        let members = JSON.parse(localStorage.getItem("members")) || [];
+        let tableBody = document.getElementById("memberList");
+        tableBody.innerHTML = "";
+        if (members.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="12" style="text-align: center; font-weight: bold; color: red; font-size: 20px;">No members added till now!</td></tr>`;
+        return;
+    }
+
+        members.forEach(member => {
+            let pendingAmount = calculatePending(member.membership, member.paid);
+            let row = `<tr>
+                <td>${member.id}</td>
+                <td contenteditable="true" id="name-${member.id}">${member.name}</td>
+                <td contenteditable="true" id="age-${member.id}">${member.age}</td>
+                <td>
+                <select id="gender-${member.id}">
+                    <option value="Male" ${member.gender === "Male" ? "selected" : ""}>Male</option>
+                    <option value="Female" ${member.gender === "Female" ? "selected" : ""}>Female</option>
+                    <option value="Other" ${member.gender === "Other" ? "selected" : ""}>Other</option>
+                </select>
+            </td>
+                <td contenteditable="true" id="email-${member.id}">${member.email}</td>
+                <td contenteditable="true" id="contact-${member.id}">${member.contact}</td>
+                <td>
+                    <select id="membership-${member.id}" onchange="updatePending('${member.id}')">
+                        <option value="3" ${member.membership == 3 ? "selected" : ""}>3 Months</option>
+                        <option value="6" ${member.membership == 6 ? "selected" : ""}>6 Months</option>
+                        <option value="12" ${member.membership == 12 ? "selected" : ""}>1 Year</option>
+                    </select>
+                </td>
+                <td><input type="date" id="startDate-${member.id}" value="${member.startDate}"></td>
+                <td><input type="date" id="endDate-${member.id}" value="${member.endDate}"></td>
+                <td contenteditable="true" id="paid-${member.id}" oninput="updatePending('${member.id}')">${member.paid}</td>
+                <td id="pending-${member.id}">${pendingAmount}</td>
+                <td>
+                    <button class="update-btn" onclick="updateMemberInfo('${member.id}')">Update</button>
+                    <button class="active-btn" onclick="activateMember('${member.id}')">Activate</button>
+                    <button class="remove-btn" onclick="removeMember('${member.id}')">Remove</button>
+                </td>
+            </tr>`;
+            tableBody.innerHTML += row;
+        });
+    }
+
+    function updatePending(id) {
+        let membership = parseInt(document.getElementById(`membership-${id}`).value);
+        let paidText = document.getElementById(`paid-${id}`).innerText.trim();
+        let paid = parseInt(paidText) || 0; // Default to 0 if empty or invalid
+
+        let pending = calculatePending(membership, paid);
+        document.getElementById(`pending-${id}`).innerText = pending;
+    }
+
+    function updateMemberInfo(id) {
+        let members = JSON.parse(localStorage.getItem("members")) || [];
+        let memberIndex = members.findIndex(m => m.id == id);
+
+        if (memberIndex !== -1) {
+            let membership = parseInt(document.getElementById(`membership-${id}`).value);
+            let paidText = document.getElementById(`paid-${id}`).innerText.trim();
+            let paid = parseInt(paidText) || 0;
+
+            let pending = calculatePending(membership, paid);
+
+            members[memberIndex] = {
+                ...members[memberIndex],
+                name: document.getElementById(`name-${id}`).innerText,
+                age: document.getElementById(`age-${id}`).innerText,
+                gender: document.getElementById(`gender-${id}`).value,
+                email: document.getElementById(`email-${id}`).innerText,
+                contact: document.getElementById(`contact-${id}`).innerText,
+                membership: membership,
+                startDate: document.getElementById(`startDate-${id}`).value,
+                endDate: document.getElementById(`endDate-${id}`).value,
+                paid: paid,
+                pending: pending
+            };
+
+            localStorage.setItem("members", JSON.stringify(members));
+            alert("Member updated successfully!");
+            loadMembers();
+        }
+    }
+    function activateMember(id) {
+        let members = JSON.parse(localStorage.getItem("members")) || [];
+        let activeMembers = JSON.parse(localStorage.getItem("activeMembers")) || [];
+
+        let memberIndex = members.findIndex(m => m.id == id);
+        if (memberIndex !== -1) {
+            let member = members[memberIndex];
+            activeMembers.push(member);
+            members.splice(memberIndex, 1);
+
+            localStorage.setItem("members", JSON.stringify(members));
+            localStorage.setItem("activeMembers", JSON.stringify(activeMembers));
+
+            alert("Member activated successfully!");
+            loadMembers();
+            loadActiveMembers();
+        }
+    }
+
+    function loadActiveMembers(filteredMembers = null) {
+    let activeMembers = filteredMembers || JSON.parse(localStorage.getItem("activeMembers")) || [];
+    let tableBody = document.getElementById("activeMemberList");
+    tableBody.innerHTML = "";
+
+    activeMembers.forEach(member => {
+        let pendingAmount = calculatePending(member.membership, member.paid);
+        let row = `<tr>
+            <td>${member.id}</td>
+            <td contenteditable="true" id="active-name-${member.id}">${member.name}</td>
+            <td contenteditable="true" id="active-age-${member.id}">${member.age}</td>
+            <td>
+                <select id="gender-${member.id}">
+                    <option value="Male" ${member.gender === "Male" ? "selected" : ""}>Male</option>
+                    <option value="Female" ${member.gender === "Female" ? "selected" : ""}>Female</option>
+                    <option value="Other" ${member.gender === "Other" ? "selected" : ""}>Other</option>
+                </select>
+            </td>
+            <td contenteditable="true" id="active-email-${member.id}">${member.email}</td>
+            <td contenteditable="true" id="active-contact-${member.id}">${member.contact}</td>
+            <td>
+                <select id="active-membership-${member.id}" onchange="updatePendingActive('${member.id}')">
+                    <option value="3" ${member.membership == 3 ? "selected" : ""}>3 Months</option>
+                    <option value="6" ${member.membership == 6 ? "selected" : ""}>6 Months</option>
+                    <option value="12" ${member.membership == 12 ? "selected" : ""}>1 Year</option>
+                </select>
+            </td>
+            <td><input type="date" id="active-startDate-${member.id}" value="${member.startDate}"></td>
+            <td><input type="date" id="active-endDate-${member.id}" value="${member.endDate}"></td>
+            <td contenteditable="true" id="active-paid-${member.id}" oninput="updatePendingActive('${member.id}')">${member.paid}</td>
+            <td id="active-pending-${member.id}">${pendingAmount}</td>
+            <td><a href="billing.html?id=${member.id}">Billing</a></td>
+            <td>
+                <button class="update-btn" onclick="updateActiveMemberInfo('${member.id}')">Update</button>
+                <button class="remove-btn" onclick="removeActiveMember('${member.id}')">Remove</button>
+            </td>
+        </tr>`;
+        tableBody.innerHTML += row;
+    });
+
+    if (activeMembers.length === 0) {
+        tableBody.innerHTML = "<tr><td colspan='13' style='text-align:center;'>No matching active members found!</td></tr>";
+    }
+}
+
+    function updatePendingActive(id) {
+        let membership = parseInt(document.getElementById(`active-membership-${id}`).value);
+        let paidText = document.getElementById(`active-paid-${id}`).innerText.trim();
+        let paid = parseInt(paidText) || 0;
+
+        let pending = calculatePending(membership, paid);
+        document.getElementById(`active-pending-${id}`).innerText = pending;
+    }
+
+    function updateActiveMemberInfo(id) {
+    let activeMembers = JSON.parse(localStorage.getItem("activeMembers")) || [];
+    let memberIndex = activeMembers.findIndex(m => String(m.id) === String(id));
+
+    if (memberIndex !== -1) {
+        let name = document.getElementById(`active-name-${id}`).innerText.trim();
+        let age = document.getElementById(`active-age-${id}`).innerText.trim();
+        let gender = document.getElementById(`gender-${id}`).value; // Select field fix
+        let email = document.getElementById(`active-email-${id}`).innerText.trim();
+        let contact = document.getElementById(`active-contact-${id}`).innerText.trim();
+        let membership = parseInt(document.getElementById(`active-membership-${id}`).value) || 0;
+        let startDate = document.getElementById(`active-startDate-${id}`).value;
+        let endDate = document.getElementById(`active-endDate-${id}`).value;
+        
+        // Get "paid" amount correctly (since contenteditable doesn't update innerText reliably)
+        let paidElement = document.getElementById(`active-paid-${id}`);
+        let paid = parseInt(paidElement.innerText.trim() || paidElement.textContent.trim()) || 0;
+
+        let pending = calculatePending(membership, paid);
+
+        // Update activeMembers object
+        activeMembers[memberIndex] = {
+            ...activeMembers[memberIndex],
+            name,
+            age,
+            gender,
+            email,
+            contact,
+            membership,
+            startDate,
+            endDate,
+            paid,
+            pending
+        };
+
+        // Save back to localStorage
+        localStorage.setItem("activeMembers", JSON.stringify(activeMembers));
+        alert("Active member updated successfully!");
+        loadActiveMembers();
+    } else {
+        console.error("Member ID not found in activeMembers:", id);
+    }
+}
+    function removeMember(id) {
+        let members = JSON.parse(localStorage.getItem("members")) || [];
+        members = members.filter(member => member.id !== id);
+        localStorage.setItem("members", JSON.stringify(members));
+        loadMembers();
+    }
+
+    function removeActiveMember(id) {
+    if (confirm("Are you sure you want to remove this member? This action cannot be undone.")) {
+        let activeMembers = JSON.parse(localStorage.getItem("activeMembers")) || [];
+        activeMembers = activeMembers.filter(member => member.id !== id);
+        localStorage.setItem("activeMembers", JSON.stringify(activeMembers));
+        loadActiveMembers();
+    }
+}
+
+   // Search Functionality for Members
+   function searchActiveMembers() {
+    let searchValue = document.getElementById("searchActiveBar").value.toLowerCase();
+    let activeMembers = JSON.parse(localStorage.getItem("activeMembers")) || [];
+
+    if (searchValue === "") {
+        // If the search bar is empty, reload the full list
+        loadActiveMembers();
+        return;
+    }
+
+    let filteredMembers = activeMembers.filter(member => 
+        String(member.id).toLowerCase().includes(searchValue) ||
+        member.name.toLowerCase().includes(searchValue) ||
+        (member.email && member.email.toLowerCase().includes(searchValue)) ||
+        (member.contact && member.contact.toLowerCase().includes(searchValue))
+    );
+
+    // Correct function call to update the active members list
+    loadActiveMembers(filteredMembers);
+}
+
+</script>
+</body>
+</html>
