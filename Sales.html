@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Report & Balance Sheet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            background-image: url('https://plus.unsplash.com/premium_photo-1661265933107-85a5dbd815af?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8Z3ltfGVufDB8fDB8fHww');
+            background-size: cover; /* or contain, or auto, etc. */
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        }
+        .scrollable-table {
+            max-height: 400px;
+            overflow-y: auto;
+            display: block;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        .scrollable-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .scrollable-table th, .scrollable-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .scrollable-table thead th {
+            position: sticky;
+            top: 0;
+            background-color: #f9f9f9;
+            font-weight: 600;
+            color: #4a5568;
+        }
+        .cta-button {
+            display: inline-block;
+            padding: 14px 30px;
+            background: #e67e22;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .cta-button:hover {
+            background: #d35400;
+            transform: scale(1.05);
+        }
+        .chart-container {
+            width: 100%;
+            max-width: 550px;
+            margin: 25px auto;
+        }
+        .form-input {
+            width: calc(100% - 30px);
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        .summary-item {
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <center><a href="home.html" class="cta-button">Home</a></center><br>
+    <div class="container" >
+        <h2 class="text-3xl font-semibold mb-6 text-orange-600">Sales Report & Balance Sheet</h2>
+
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 class="section-title">Financial Summary</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="summary-item">
+                    <p class="text-gray-600">Total Membership Revenue (Paid):</p>
+                    <p id="total-membership-paid" class="text-2xl font-bold text-green-600">₹0</p>
+                </div>
+                <div class="summary-item">
+                    <p class="text-gray-600">Total Membership Pending:</p>
+                    <p id="total-membership-pending" class="text-2xl font-bold text-red-600">₹0</p>
+                </div>
+                <div class="summary-item">
+                    <p class="text-gray-600">Total Equipment Cost:</p>
+                    <p id="total-equipment-cost" class="text-2xl font-bold text-red-600">₹0</p>
+                </div>
+                <div class="summary-item">
+                    <p class="text-gray-600">Total Maintenance Cost:</p>
+                    <p id="total-maintenance-cost" class="text-2xl font-bold text-red-600">₹0</p>
+                </div>
+                <div class="summary-item md:col-span-2">
+                    <p class="text-gray-600">Net Profit (Revenue - Costs):</p>
+                    <p id="net-profit" class="text-2xl font-bold text-blue-600">₹0</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 class="section-title">Balance Sheet</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <h4 class="text-lg font-semibold text-gray-700">Assets</h4>
+                    <p>Total Equipment Value: <span id="total-assets" class="font-bold">₹0</span></p>
+                    <p>Cash (Membership Paid): <span id="cash-assets" class="font-bold">₹0</span></p>
+                    <p class="mt-2">Total Assets: <span id="total-assets-sum" class="font-bold text-green-600">₹0</span></p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold text-gray-700">Liabilities</h4>
+                    <p>Membership Pending: <span id="total-liabilities" class="font-bold">₹0</span></p>
+                    <p class="mt-2">Total Liabilities: <span id="total-liabilities-sum" class="font-bold text-red-600">₹0</span></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 class="section-title">Financial Visualizations</h3>
+            <div class="flex flex-wrap justify-around">
+                <div class="chart-container">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="costChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 class="section-title">Membership Sales</h3>
+            <input type="text" id="membership-search" placeholder="Search Members..." class="form-input">
+            <div class="scrollable-table">
+                <table class="min-w-full table-auto rounded-lg">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-gray-600 font-semibold uppercase">Member Name</th>
+                            <th class="px-4 py-2 text-left text-gray-600 font-semibold uppercase">Membership Type</th>
+                            <th class="px-4 py-2 text-left text-gray-600 font-semibold uppercase">Paid</th>
+                            <th class="px-4 py-2 text-left text-gray-600 font-semibold uppercase">Pending</th>
+                        </tr>
+                    </thead>
+                    <tbody id="membership-sales-list" class="text-gray-700"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 class="section-title">Equipment Costs</h3>
+            <input type="text" id="equipment-search" placeholder="Search Equipment..." class="form-input">
+            <div class="scrollable-table">
+                <table class="min-w-full table-auto rounded-lg">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-gray-600 font-semibold uppercase">Equipment Name</th>
+                            <th class="px-4 py-2 text-left text-gray-600 font-semibold uppercase">Quantity</th>
+                            <th class="px-4 py-2 text-left text-gray-600 font-semibold uppercase">Total Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody id="equipment-costs-list" class="text-gray-700"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="section-title">Maintenance Costs</h3>
+            <input type="text" id="maintenance-search" placeholder="Search Maintenance..." class="form-input">
+            <div class="scrollable-table">
+                <table class="min-w-full table-auto rounded-lg">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-gray-600 font-semibold uppercase">Equipment Name</th>
+                            <th class="px-4 py-2 text-left text-gray-600 font-semibold uppercase">Maintenance Cost</th>
+                            <th class="px-4 py-2 text-left text-gray-600 font-semibold uppercase">Next Maintenance Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="maintenance-costs-list" class="text-gray-700"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let activeMembers = [];
+        let equipmentData = [];
+        let maintenanceData = [];
+        let revenueChart, costChart;
+
+        // Fetch data from localStorage
+        function fetchData() {
+            activeMembers = JSON.parse(localStorage.getItem('activeMembers')) || [];
+            equipmentData = JSON.parse(localStorage.getItem('equipmentData')) || [];
+            maintenanceData = JSON.parse(localStorage.getItem('maintenanceData')) || [];
+            console.log('Fetched Data:', { activeMembers, equipmentData, maintenanceData });
+        }
+
+        // Update summary and balance sheet
+        function updateSummaryAndBalanceSheet() {
+            const totalMembershipPaid = activeMembers.reduce((sum, member) => sum + (parseInt(member.paid) || 0), 0);
+            const totalMembershipPending = activeMembers.reduce((sum, member) => sum + (parseInt(member.pending) || 0), 0);
+            const totalEquipmentCost = equipmentData.reduce((sum, item) => sum + (item.quantity * (parseFloat(item.price) || 0)), 0);
+            const totalMaintenanceCost = maintenanceData.reduce((sum, item) => sum + (parseFloat(item.maintenancePrice) || 0), 0);
+            const netProfit = totalMembershipPaid - (totalEquipmentCost + totalMaintenanceCost);
+
+            document.getElementById('total-membership-paid').textContent = `₹${totalMembershipPaid.toFixed(2)}`;
+            document.getElementById('total-membership-pending').textContent = `₹${totalMembershipPending.toFixed(2)}`;
+            document.getElementById('total-equipment-cost').textContent = `₹${totalEquipmentCost.toFixed(2)}`;
+            document.getElementById('total-maintenance-cost').textContent = `₹${totalMaintenanceCost.toFixed(2)}`;
+            document.getElementById('net-profit').textContent = `₹${netProfit.toFixed(2)}`;
+
+            document.getElementById('total-assets').textContent = `₹${totalEquipmentCost.toFixed(2)}`;
+            document.getElementById('cash-assets').textContent = `₹${totalMembershipPaid.toFixed(2)}`;
+            document.getElementById('total-assets-sum').textContent = `₹${(totalEquipmentCost + totalMembershipPaid).toFixed(2)}`;
+            document.getElementById('total-liabilities').textContent = `₹${totalMembershipPending.toFixed(2)}`;
+            document.getElementById('total-liabilities-sum').textContent = `₹${totalMembershipPending.toFixed(2)}`;
+
+            updateCharts(totalMembershipPaid, totalEquipmentCost, totalMaintenanceCost);
+        }
+
+        // Render Membership Sales
+        function renderMembershipSales(searchTerm = '') {
+            const membershipList = document.getElementById('membership-sales-list');
+            membershipList.innerHTML = '';
+            activeMembers
+                .filter(member => member.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                .forEach(member => {
+                    const row = document.createElement('tr');
+                    const membershipType = member.membership == 3 ? '3 Months' : member.membership == 6 ? '6 Months' : '1 Year';
+                    row.innerHTML = `
+                        <td class="px-4 py-2">${member.name}</td>
+                        <td class="px-4 py-2">${membershipType}</td>
+                        <td class="px-4 py-2">₹${member.paid || 0}</td>
+                        <td class="px-4 py-2">₹${member.pending || 0}</td>
+                    `;
+                    membershipList.appendChild(row);
+                });
+        }
+
+        // Render Equipment Costs
+        function renderEquipmentCosts(searchTerm = '') {
+            const equipmentList = document.getElementById('equipment-costs-list');
+            equipmentList.innerHTML = '';
+            equipmentData
+                .filter(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                .forEach(item => {
+                    const row = document.createElement('tr');
+                    const totalCost = (item.quantity * (parseFloat(item.price) || 0)).toFixed(2);
+                    row.innerHTML = `
+                        <td class="px-4 py-2">${item.name}</td>
+                        <td class="px-4 py-2">${item.quantity}</td>
+                        <td class="px-4 py-2">₹${totalCost}</td>
+                    `;
+                    equipmentList.appendChild(row);
+                });
+        }
+
+        // Render Maintenance Costs
+        function renderMaintenanceCosts(searchTerm = '') {
+            const maintenanceList = document.getElementById('maintenance-costs-list');
+            maintenanceList.innerHTML = '';
+            maintenanceData
+                .filter(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                .forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-4 py-2">${item.name}</td>
+                        <td class="px-4 py-2">₹${item.maintenancePrice || 0}</td>
+                        <td class="px-4 py-2">${item.nextMaintenance}</td>
+                    `;
+                    maintenanceList.appendChild(row);
+                });
+        }
+
+        // Update Charts
+        function updateCharts(totalMembershipPaid, totalEquipmentCost, totalMaintenanceCost) {
+            if (revenueChart) revenueChart.destroy();
+            revenueChart = new Chart(document.getElementById('revenueChart'), {
+                type: 'pie',
+                data: {
+                    labels: ['Membership Paid', 'Membership Pending'],
+                    datasets: [{
+                        data: [totalMembershipPaid, activeMembers.reduce((sum, member) => sum + (parseInt(member.pending) || 0), 0)],
+                        backgroundColor: ['#34D399', '#F87171']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: { display: true, text: 'Revenue Breakdown' }
+                    }
+                }
+            });
+
+            if (costChart) costChart.destroy();
+            costChart = new Chart(document.getElementById('costChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Equipment Cost', 'Maintenance Cost'],
+                    datasets: [{
+                        label: 'Costs',
+                        data: [totalEquipmentCost, totalMaintenanceCost],
+                        backgroundColor: ['#F87171', '#FB923C']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Cost Breakdown' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // Update all data and re-render
+        function updateAll() {
+            fetchData();
+            updateSummaryAndBalanceSheet();
+            renderMembershipSales(document.getElementById('membership-search').value);
+            renderEquipmentCosts(document.getElementById('equipment-search').value);
+            renderMaintenanceCosts(document.getElementById('maintenance-search').value);
+        }
+
+        // Search functionality
+        document.getElementById('membership-search').addEventListener('input', function () {
+            renderMembershipSales(this.value);
+        });
+        document.getElementById('equipment-search').addEventListener('input', function () {
+            renderEquipmentCosts(this.value);
+        });
+        document.getElementById('maintenance-search').addEventListener('input', function () {
+            renderMaintenanceCosts(this.value);
+        });
+
+        // Polling mechanism with deep comparison
+        function startPolling() {
+            let lastData = {
+                activeMembers: JSON.stringify(activeMembers),
+                equipmentData: JSON.stringify(equipmentData),
+                maintenanceData: JSON.stringify(maintenanceData)
+            };
+
+            setInterval(() => {
+                fetchData();
+                const currentData = {
+                    activeMembers: JSON.stringify(activeMembers),
+                    equipmentData: JSON.stringify(equipmentData),
+                    maintenanceData: JSON.stringify(maintenanceData)
+                };
+
+                if (
+                    currentData.activeMembers !== lastData.activeMembers ||
+                    currentData.equipmentData !== lastData.equipmentData ||
+                    currentData.maintenanceData !== lastData.maintenanceData
+                ) {
+                    console.log('Data changed, updating UI...');
+                    lastData = { ...currentData };
+                    updateAll();
+                }
+            }, 500); // Check every 0.5 seconds
+        }
+
+        // Initial render and start polling
+        updateAll();
+        startPolling();
+    </script>
+</body>
+</html>
