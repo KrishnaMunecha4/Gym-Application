@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trainer Attendance Marking</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        @media print {
+            body {
+                background: white !important;
+            }
+            .day {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .present {
+                background-color: green !important;
+                color: white !important;
+            }
+            .absent {
+                background-color: red !important;
+                color: white !important;
+            }
+        }
+        .default {
+            background-color: lightgray;
+        }
+        .present {
+            background-color: green !important;
+            color: white !important;
+        }
+        .absent {
+            background-color: red !important;
+            color: white !important;
+
+
+        }
+        body {
+            font-family: Arial, sans-serif;
+           margin: 0; /* Remove default margin */
+            padding: 0; /* Remove default padding */
+            background-color: #f4f4f4; /* Fallback color */
+            position: relative; /* Positioning context for ::before */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        /* Background image with hover animation */
+        body::before {
+            content: "";
+            position: fixed; /* Fixed to stay in the background */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://plus.unsplash.com/premium_photo-1664109999817-f077d8ec76fe?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: -1; /* Place behind content */
+            animation: hoverEffect 10s infinite ease-in-out; /* Animation for hover effect */
+        }
+
+        @keyframes hoverEffect {
+            0% {
+                transform: scale(1); /* Normal size */
+                opacity: 0.8; /* Slightly faded */
+            }
+            50% {
+                transform: scale(1.30); /* Slightly zoomed in */
+                opacity: 1; /* Fully visible */
+            }
+            100% {
+                transform: scale(1); /* Back to normal */
+                opacity: 0.8; /* Slightly faded again */
+            }
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            max-width: 800px;
+            margin: auto;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px #aaa;
+        }
+        .month {
+            margin: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background: #fff;
+            border-radius: 8px;
+        }
+        .days {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .day {
+            width: 30px;
+            height: 30px;
+            margin: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+        #exportButton { /* Added ID for the export button */
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #exportButton:hover {
+            background-color: #0056b3;
+        }
+        #printButton { /* Added ID for the export button */
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #printButton:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <center><a href="home.html" class="cta-button">Home</a></center><br>
+    <div class="container">
+        <h2>Trainer Attendance Marking</h2>
+
+        <label for="yearSelect">Select Year:</label>
+        <select id="yearSelect"></select>
+
+        <label for="trainerSelect">Select Trainer:</label>
+        <select id="trainerSelect"></select>
+
+        <div id="calendarContainer"></div>
+
+        <button id="printButton" onclick="printAttendance()">Print</button>
+        <button id="exportButton" onclick="exportAttendanceToCsv()">Export to CSV</button> <br><br>
+    </section>
+        <center><div id="attendanceTable"></div></center>
+    </div>
+
+    <script>
+        const currentYear = new Date().getFullYear();
+
+        document.addEventListener("DOMContentLoaded", () => {
+            populateYears();
+            loadTrainers();
+        });
+
+        function populateYears() {
+            const yearSelect = document.getElementById("yearSelect");
+            for (let i = currentYear - 5; i <= currentYear + 5; i++) {
+                let option = document.createElement("option");
+                option.value = i;
+                option.textContent = i;
+                if (i === currentYear) option.selected = true;
+                yearSelect.appendChild(option);
+            }
+        }
+
+        function loadTrainers() {
+            const trainers = JSON.parse(localStorage.getItem("trainers")) || [];
+            const trainerSelect = document.getElementById("trainerSelect");
+            trainerSelect.innerHTML = `<option value="">Select Trainer</option>`;
+
+            trainers.forEach(trainer => {
+                let option = document.createElement("option");
+                option.value = trainer.trainerID;
+                option.textContent = trainer.name;
+                trainerSelect.appendChild(option);
+            });
+
+            trainerSelect.addEventListener("change", generateCalendar);
+            document.getElementById("yearSelect").addEventListener("change", generateCalendar);
+            generateCalendar();
+        }
+
+        function toggleAttendance(year, month, day, trainerID) {
+            let attendanceData = JSON.parse(localStorage.getItem(`attendance_${trainerID}_${year}`)) || {};
+            let monthKey = `${year}-${String(month).padStart(2, '0')}`;
+
+            if (!attendanceData[monthKey]) {
+                attendanceData[monthKey] = {};
+            }
+
+            let dayKey = String(day).padStart(2, '0');
+
+            if (!attendanceData[monthKey][dayKey]) {
+                attendanceData[monthKey][dayKey] = 'P';
+            } else if (attendanceData[monthKey][dayKey] === 'P') {
+                attendanceData[monthKey][dayKey] = 'A';
+            } else {
+                delete attendanceData[monthKey][dayKey];
+            }
+
+            localStorage.setItem(`attendance_${trainerID}_${year}`, JSON.stringify(attendanceData));
+            generateCalendar();
+        }
+
+        function generateCalendar() {
+            const calendarContainer = document.getElementById("calendarContainer");
+            calendarContainer.innerHTML = "";
+            const selectedYear = parseInt(document.getElementById("yearSelect").value);
+            const trainerID = document.getElementById("trainerSelect").value;
+
+            if (!trainerID) {
+                calendarContainer.innerHTML = "<p>Please select a trainer.</p>";
+                return;
+            }
+
+            let attendanceData = JSON.parse(localStorage.getItem(`attendance_${trainerID}_${selectedYear}`)) || {};
+
+            for (let month = 0; month < 12; month++) {
+                let monthDiv = document.createElement("div");
+                monthDiv.classList.add("month");
+                monthDiv.innerHTML = `<h3>${new Date(selectedYear, month).toLocaleString('default', { month: 'long' })}</h3>`;
+                let daysDiv = document.createElement("div");
+                daysDiv.classList.add("days");
+
+                let daysInMonth = new Date(selectedYear, month + 1, 0).getDate();
+                for (let day = 1; day <= daysInMonth; day++) {
+                    let dayCell = document.createElement("div");
+                    dayCell.classList.add("day");
+                    dayCell.textContent = day;
+                    dayCell.dataset.month = month + 1;
+                    dayCell.dataset.year = selectedYear;
+                    dayCell.dataset.day = day;
+                    dayCell.onclick = () => toggleAttendance(selectedYear, month + 1, day, trainerID);
+
+                    let status = attendanceData[`${selectedYear}-${String(month + 1).padStart(2, '0')}`]?.[String(day).padStart(2, '0')];
+                    if (status === 'P') {
+                        dayCell.classList.add("present");
+                    } else if (status === 'A') {
+                        dayCell.classList.add("absent");
+                    } else {
+                        dayCell.classList.add("default");
+                    }
+
+                    daysDiv.appendChild(dayCell);
+                }
+                monthDiv.appendChild(daysDiv);
+                calendarContainer.appendChild(monthDiv);
+            }
+        }
+
+        function printAttendance() {
+            document.body.offsetHeight;
+            window.print();
+        }
+
+        function exportAttendanceToCsv() {
+            const selectedYear = parseInt(document.getElementById("yearSelect").value);
+            const trainerID = document.getElementById("trainerSelect").value;
+            const trainerName = document.getElementById("trainerSelect").options[document.getElementById("trainerSelect").selectedIndex].text; // Get trainer name from dropdown
+            let attendanceData = JSON.parse(localStorage.getItem(`attendance_${trainerID}_${selectedYear}`)) || {};
+
+            let csvContent = "Year,Trainer ID,Trainer Name,Month,Day,Status\n"; // Header
+
+            for (let month = 0; month < 12; month++) {
+                const monthName = new Date(selectedYear, month).toLocaleString('default', { month: 'long' });
+                const monthKey = `${selectedYear}-${String(month + 1).padStart(2, '0')}`;
+                if (attendanceData[monthKey]) {
+                    for (const day in attendanceData[monthKey]) {
+                        const status = attendanceData[monthKey][day];
+                        csvContent += `${selectedYear},${trainerID},${trainerName},${monthName},${day},${status}\n`;
+                    }
+                }
+            }
+
+            const encodedUri = encodeURI("data:text/csv;charset=utf-8," + csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `attendance_${trainerID}_${selectedYear}.csv`); // Filename includes trainer ID and year
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
