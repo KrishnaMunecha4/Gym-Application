@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trainer Attendance</title>
+    <style>
+        .forgot-password-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem; /* Equivalent to px-4 py-2 */
+  margin-top: 1.5rem; /* Equivalent to mt-6 */
+  font-size: 0.875rem; /* Equivalent to text-sm */
+  font-weight: 500; /* Equivalent to font-medium */
+  color: #f472b6; /* Equivalent to text-pink-300 */
+  transition: color 0.3s, background-color 0.3s; /* Equivalent to transition-colors duration-300 */
+  border-radius: 0.375rem; /* Equivalent to rounded-md */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Equivalent to shadow-md */
+  background-color: lightpink; /* Makes the background transparent initially */
+  border: none; /* remove default border */
+  cursor: pointer; /* Change cursor to pointer for better UX */
+}
+
+.forgot-password-link:hover {
+  background-color: #ec4899; /* Equivalent to hover:bg-pink-500 */
+  color: white; /* Equivalent to hover:text-white */
+}
+
+.forgot-password-link:focus {
+  outline: none; /* Equivalent to focus:outline-none */
+  box-shadow: 0 0 0 2px rgba(253, 164, 175, 0.5), 0 0 0 4px rgba(253, 164, 175, 0.2); /* Creates a focus ring */
+}
+        body {
+            background: linear-gradient(to bottom, lightblue,ivory);
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvjVhyAwxbE9xiAbdFabIgLk85qsdXvZDEvJoN3DEdImRoPpzvFSyduSwPjH4oPJ9hjKA&usqp=CAU'); /* 1080p gym image */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: -1;
+            animation: hoverEffect 30s infinite ease-in-out;
+        }
+
+        }
+
+        .container {
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            width: 80%;
+            margin: auto;
+            background: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, ivory, lightblue);
+            border-radius: 15px;
+            opacity: 0.5;
+            animation: pulse 5s infinite;
+            z-index: -1;
+
+        }
+
+        .login-section {
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            box-shadow: 0 1.25rem 3rem rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 32rem;
+        }
+
+        .login-section input {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border: 2px solid rgba(167, 139, 250, 0.3);
+            background-color: rgba(0, 0, 0, 0.2);
+            color: #ffffff;
+            placeholder-color: rgba(209, 213, 219, 0.4);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .login-section input:focus {
+            outline: none;
+            border-color: #a855f7;
+            box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.5);
+        }
+
+        .login-section button {
+            background-image: linear-gradient(to-r, #a855f7, #f9a8d4);
+            color: #fff;
+            font-weight: 700;
+            padding: 0.8rem 2rem;
+            border-radius: 2rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            transform: scale(1);
+            width: 100%;
+            font-size: 1.125rem;
+        }
+
+        .login-section button:hover {
+            background-image: linear-gradient(to-r, #9333ea, #f06292);
+            transform: scale(1.05);
+            box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.3);
+        }
+
+        .login-section button:focus {
+            outline: none;
+            ring-color: #a855f7;
+            ring-offset-width: 2px;
+            ring-opacity: 50;
+        }
+
+        .login-section a {
+            color: #f5d0fe;
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-top: 1rem;
+            transition: color 0.2s ease;
+        }
+
+        .login-section a:hover {
+            color: #f06292;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+
+        .delete-btn {
+            background: red;
+        }
+
+        .delete-btn:hover {
+            background: darkred;
+        }
+        .cta-button {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 25px;
+  background: #e67e22;
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.cta-button:hover {
+  background: #d35400;
+  transform: scale(1.1);
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <center><a href="home.html" class="cta-button">Home</a></center><br>
+        <h2>Trainer Attendance System</h2>
+        <center><div class="login-section">
+            <input type="password" id="password" placeholder="Enter Password" class="w-full px-6 py-4 rounded-xl border border-purple-500/30 focus:border-purple-500 focus:ring-purple-500 text-white placeholder:text-gray-300 mb-8 font-semibold transition-all duration-300 bg-black/20" />
+            <button onclick="authenticate()" class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 text-lg">Login</button>
+            <a href="#" onclick="forgotPassword()" class="forgot-password-link">Forgot Password?</a>
+        </div></center>
+        
+        <div class="attendance-section" style="display:none;">
+            <h3>Add New Trainer</h3>
+            <input type="text" id="trainerName" placeholder="Trainer Name">
+            <input type="text" id="contactNumber" placeholder="Contact Number (10 Digits)">
+            <input type="text" id="aadhaarCard" placeholder="Aadhaar Card (12 Digits)">
+            <input type="text" id="panCard" placeholder="PAN Card (Format: ABCD1234E)">
+            <input type="date" id="admissionDate">
+            <button onclick="addTrainer()">Add Trainer</button><br><br>
+            
+            <h3>Trainer List</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Contact</th>
+                        <th>Aadhaar</th>
+                        <th>PAN</th>
+                        <th>Admission Date</th>
+                        <th>Leave Date</th>
+                        <th>Update Contact</th>
+                        <th>Remove</th>
+                    </tr>
+                </thead>
+                <tbody id="trainerList"></tbody>
+            </table>
+            
+            <a href="attendancemark.html" class="view-attendance">View Attendance Records</a>
+        </div>
+    </div>
+    
+    <script>
+        function authenticate() {
+            const password = document.getElementById("password").value;
+            if (password === "admin123") {
+                sessionStorage.setItem('loginTime', new Date().getTime());
+                document.querySelector(".attendance-section").style.display = "block";
+                document.querySelector(".login-section").style.display = "none";
+                loadTrainers();
+            } else {
+                alert("Incorrect password!");
+            }
+        }
+        function forgotPassword() {
+            const email = prompt("Enter your email address:");
+            if (email) {
+                alert(`Password reset email sent to ${email}. This is a simulation.`);
+            } else {
+                alert("No email provided.");
+            }
+        }
+
+        function generateTrainerID() {
+            return Math.floor(100000 + Math.random() * 900000);
+        }
+
+        function addTrainer() {
+            const name = document.getElementById("trainerName").value;
+            const contact = document.getElementById("contactNumber").value;
+            const aadhaar = document.getElementById("aadhaarCard").value;
+            const pan = document.getElementById("panCard").value;
+            const admissionDate = document.getElementById("admissionDate").value;
+
+            if (!name || !contact || !aadhaar || !pan || !admissionDate) {
+                alert("Please fill all details");
+                return;
+            }
+            if (!/^\d{10}$/.test(contact)) {
+                alert("Invalid contact number! Must be 10 digits.");
+                return;
+            }
+            if (!/^\d{12}$/.test(aadhaar)) {
+                alert("Invalid Aadhaar number! Must be 12 digits.");
+                return;
+            }
+            if (!/^[A-Z]{4}\d{4}[A-Z]{1}$/.test(pan)) {
+                alert("Invalid PAN format! Format: ABCD1234E");
+                return;
+            }
+
+            const trainerID = generateTrainerID();
+            const trainerData = { trainerID, name, contact, aadhaar, pan, admissionDate, leaveDate: "" };
+            saveTrainer(trainerData);
+        }
+
+        function saveTrainer(trainer) {
+            let trainers = JSON.parse(localStorage.getItem("trainers")) || [];
+            trainers.push(trainer);
+            localStorage.setItem("trainers", JSON.stringify(trainers));
+            loadTrainers();
+        }
+
+        function loadTrainers() {
+            const table = document.getElementById("trainerList");
+            table.innerHTML = "";
+            let trainers = JSON.parse(localStorage.getItem("trainers")) || [];
+            
+            trainers.forEach(trainer => {
+                const row = table.insertRow();
+                row.innerHTML = `
+                    <td>${trainer.trainerID}</td>
+                    <td>${trainer.name}</td>
+                    <td>${trainer.contact}</td>
+                    <td>${trainer.aadhaar}</td>
+                    <td>${trainer.pan}</td>
+                    <td>${trainer.admissionDate}</td>
+                    <td><input type="date" class="leaveDate" value="${trainer.leaveDate}"></td>
+                    <td><button onclick="updateContact(this, ${trainer.trainerID})">Update Contact</button></td>
+                    <td><button class="delete-btn" onclick="removeTrainer(${trainer.trainerID})">Remove</button></td>
+                `;
+            });
+        }
+
+        function updateContact(button, id) {
+            const row = button.parentElement.parentElement;
+            const contactCell = row.cells[2];
+            const newContact = prompt("Enter new contact number:", contactCell.innerText);
+
+            if (!newContact || !/^\d{10}$/.test(newContact)) {
+                alert("Invalid contact number! Must be 10 digits.");
+                return;
+            }
+
+            let trainers = JSON.parse(localStorage.getItem("trainers")) || [];
+            trainers = trainers.map(trainer => {
+                if (trainer.trainerID === id) {
+                    trainer.contact = newContact;
+                }
+                return trainer;
+            });
+
+            localStorage.setItem("trainers", JSON.stringify(trainers));
+            loadTrainers();
+        }
+
+        function removeTrainer(id) {
+            let trainers = JSON.parse(localStorage.getItem("trainers")) || [];
+            trainers = trainers.filter(trainer => trainer.trainerID !== id);
+            localStorage.setItem("trainers", JSON.stringify(trainers));
+            loadTrainers();
+        }
+    </script>
+</body>
+</html>
