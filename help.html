@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gym Management - Help</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Assuming shared sidebar styles -->
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+            display: flex;
+        }
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            margin-left: 250px;
+        }
+
+        .help-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .help-container h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 2rem;
+        }
+
+        .help-section {
+            margin-bottom: 30px;
+        }
+
+        .help-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .help-section p {
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .help-section ul {
+            list-style-type: disc;
+            margin-left: 25px;
+            color: #555;
+        }
+
+        .help-section li {
+            line-height: 1.7;
+            margin-bottom: 5px;
+        }
+
+        .highlight {
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .emoji {
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <h2>Gym Management</h2>
+        <ul>
+            <li><a href="home.html">Home</a></li>
+            <li><a href="help.html">Help</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="help-container">
+            <h1>Help Center <span class="emoji">🏋️‍♂️</span></h1>
+
+            <div class="help-section">
+                <h2>Adding Gym Members <span class="emoji">👤</span></h2>
+                <p>Need to add new members to your gym? Here’s how:</p>
+                <ul>
+                    <li>Fill in the <span class="highlight">"Full Name"</span>, <span class="highlight">"Age"</span>, <span class="highlight">"Gender"</span>, <span class="highlight">"Email"</span>, and <span class="highlight">"Contact"</span> fields.</li>
+                    <li>Select the <span class="highlight">"Membership Duration"</span> (3, 6, or 12 months).</li>
+                    <li>Enter the <span class="highlight">"Amount Paid"</span> to calculate the pending amount automatically.</li>
+                    <li>Click <span class="highlight">"Add Member"</span> to save the member. They’ll appear in the list below.</li>
+                    <li>To remove a member, click <span class="highlight">"Remove"</span> in the Action column.</li>
+                </ul>
+            </div>
+
+            <div class="help-section">
+                <h2>Trainer Attendance Marking <span class="emoji">📅</span></h2>
+                <p>Track your trainers’ attendance with ease:</p>
+                <ul>
+                    <li>Select a <span class="highlight">"Year"</span> and a <span class="highlight">"Trainer"</span> from the dropdowns.</li>
+                    <li>Click a day to toggle attendance: gray (unset), green (<span class="highlight">"Present"</span>), or red (<span class="highlight">"Absent"</span>).</li>
+                    <li>Use <span class="highlight">"Print"</span> to print the calendar or <span class="highlight">"Export to CSV"</span> to download attendance data.</li>
+                </ul>
+            </div>
+
+            <div class="help-section">
+                <h2>Sales Report & Balance Sheet <span class="emoji">💰</span></h2>
+                <p>Get a financial overview of your gym:</p>
+                <ul>
+                    <li>View totals for <span class="highlight">"Membership Revenue (Paid)"</span>, <span class="highlight">"Pending"</span>, <span class="highlight">"Equipment Costs"</span>, and <span class="highlight">"Maintenance Costs"</span>.</li>
+                    <li>Check the <span class="highlight">"Net Profit"</span> and balance sheet details (Assets and Liabilities).</li>
+                    <li>Use the search bars to filter <span class="highlight">"Membership Sales"</span>, <span class="highlight">"Equipment Costs"</span>, or <span class="highlight">"Maintenance Costs"</span>.</li>
+                    <li>Visualize data with the <span class="highlight">"Revenue"</span> pie chart and <span class="highlight">"Cost"</span> bar chart.</li>
+                </ul>
+            </div>
+
+            <div class="help-section">
+                <h2>Managing Trainers <span class="emoji">🧑‍🏫</span></h2>
+                <p>Handle trainer details and attendance:</p>
+                <ul>
+                    <li>Enter the password (<span class="highlight">"admin123"</span>) to access the trainer section.</li>
+                    <li>Add a trainer by filling in <span class="highlight">"Name"</span>, <span class="highlight">"Contact"</span> (10 digits), <span class="highlight">"Aadhaar"</span> (12 digits), <span class="highlight">"PAN"</span> (e.g., ABCD1234E), and <span class="highlight">"Admission Date"</span>, then click <span class="highlight">"Add Trainer"</span>.</li>
+                    <li>Update a trainer’s contact by clicking <span class="highlight">"Update Contact"</span> or remove them with <span class="highlight">"Remove"</span>.</li>
+                    <li>Click <span class="highlight">"View Attendance Records"</span> to mark their attendance.</li>
+                    <li>If you forget the password, click <span class="highlight">"Forgot Password?"</span> and follow the prompt (simulation only).</li>
+                </ul>
+            </div>
+
+            <div class="help-section">
+                <h2>Billing & Invoice <span class="emoji">🧾</span></h2>
+                <p>Manage member billing and invoices:</p>
+                <ul>
+                    <li>Access a member’s invoice via the <span class="highlight">"Activation"</span> link from the Add Members page.</li>
+                    <li>View details like <span class="highlight">"Total Cost"</span>, <span class="highlight">"Paid"</span>, and <span class="highlight">"Pending Amount"</span>.</li>
+                    <li>Click <span class="highlight">"Print Invoice"</span> to print or <span class="highlight">"Save Invoice"</span> to store it.</li>
+                    <li>Search saved invoices using the <span class="highlight">"Search Bar"</span>, then <span class="highlight">"Reprint"</span> or <span class="highlight">"Delete"</span> them.</li>
+                </ul>
+            </div>
+
+            <div class="help-section">
+                <h2>Adding Equipment <span class="emoji">➕</span></h2>
+                <p>Got new gear? Here's how to add it:</p>
+                <ul>
+                    <li>Type the equipment's name in the <span class="highlight">"Equipment Name"</span> box.</li>
+                    <li>Enter how many you have in the <span class="highlight">"Quantity"</span> field.</li>
+                    <li>Hit the <span class="highlight">"Add Equipment"</span> button. That's it!</li>
+                </ul>
+            </div>
+
+            <div class="help-section">
+                <h2>Scheduling Maintenance <span class="emoji">🔧</span></h2>
+                <p>Keep your equipment in top shape by scheduling maintenance:</p>
+                <ul>
+                    <li>Find the equipment by typing its name.</li>
+                    <li>Pick the <span class="highlight">"Last Maintenance Date"</span> from the calendar.</li>
+                    <li>Choose the <span class="highlight">"Next Maintenance Date"</span>.</li>
+                    <li>Click <span class="highlight">"Schedule Maintenance"</span>. You're all set!</li>
+                </ul>
+            </div>
+
+            <div class="help-section">
+                <h2>Viewing Equipment Inventory <span class="emoji">📋</span></h2>
+                <p>See all your equipment at a glance:</p>
+                <ul>
+                    <li>Use the search bar to find specific items.</li>
+                    <li>Update quantities by clicking <span class="highlight">"Update"</span>.</li>
+                    <li>Remove items with the <span class="highlight">"Delete"</span> button.</li>
+                </ul>
+            </div>
+
+            <div class="help-section">
+                <h2>Viewing Maintenance Tracking <span class="emoji">📊</span></h2>
+                <p>Keep track of maintenance schedules easily:</p>
+                <ul>
+                    <li>Search for maintenance records.</li>
+                    <li>Change the next maintenance date with <span class="highlight">"Update"</span>.</li>
+                    <li>Delete old records with <span class="highlight">"Delete"</span>.</li>
+                </ul>
+            </div>
+
+            <div class="help-section">
+                <h2>Maintenance Alert Popup <span class="emoji">🔔</span></h2>
+                <p>Don't miss a maintenance day! You'll get a popup alert one day before, with a list of what's due. Just click <span class="highlight">"Close"</span> to dismiss.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
